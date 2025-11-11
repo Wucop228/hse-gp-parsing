@@ -52,6 +52,7 @@ def get_graph_points(url, proxy, headers, ip):
             res = requests.get(url, headers=headers)
     except Exception as e:
         logger.error("Ошибка при парсинге: error=%s", e)
+        return
     else:
         logger.info("Успешно запарсил ссылку: url=%s, proxy=%s", url, ip)
 
@@ -60,6 +61,7 @@ def get_graph_points(url, proxy, headers, ip):
         res.raise_for_status()
     except requests.exceptions.HTTPError as e:
         logger.exception("Ответ вернулся с ошибкой: error=%s", e)
+        return
     else:
         logger.info("Запрос успешно выполнен: url=%s, proxy=%s", url, ip)
 
@@ -79,6 +81,7 @@ def get_graph_points(url, proxy, headers, ip):
         arr = json.loads(arr_str.strip().rstrip(","))
     except Exception as e:
         logger.error("Ошибка при преобразовании строки в массив: error=%s", e)
+        return
     else:
         logger.info("Успешно строчка преобразована в массив: arr_len=%s", len(arr))
 
@@ -100,9 +103,8 @@ while True:
             url = f"https://steamcommunity.com/market/listings/730/{items[curr]['normalizedname']}"
             try:
                 arr = get_graph_points(url, proxy=proxy, headers={"User-Agent": fake_ua}, ip=ip)
+                if arr == []: break
                 arr = [x for x in arr if "2025" in x[0] and ("Oct" in x[0] or "Nov" in x[0])]
-                logger.info("Успешно обработан запрос: curr=%s, url=%s, proxy=%s, item_id=%s, arr_len=%s",
-                            curr, url, ip, items[curr]['id'], len(arr))
                 lst.append(f"{items[curr]['id']};{items[curr]['normalizedname']};{arr}" + "\n")
                 success += 1
             except Exception as e:
@@ -110,6 +112,9 @@ while True:
                              curr, url, ip, items[curr]['id'], e)
                 failed += 1
                 break
+            else:
+                logger.info("Успешно обработан запрос: curr=%s, url=%s, proxy=%s, item_id=%s, arr_len=%s",
+                            curr, url, ip, items[curr]['id'], len(arr))
             curr += 1
             if curr >= len(items): exit()
 
