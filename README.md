@@ -44,3 +44,6 @@ rarity, itemtype, groupname- редкость и тип
 Использовал:
 
 requests, pandas, dotenv, logging, json
+
+#Ссылки на графики
+- https://colab.research.google.com/drive/1YrPk3OLkztesWGe18-co5CdTmVJ7nkdH?usp=sharing
